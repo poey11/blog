@@ -9,8 +9,8 @@ function navbar() {
 
                 <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
                 <Link to="/about" className="text-gray-700 hover:text-gray-900">About</Link>
-                <Link to="/register" className="text-gray-700 hover:text-gray-900">Register</Link>
                 <Link to="/login" className="text-gray-700 hover:text-gray-900">Login</Link>
+                <Link to="/register" className="text-gray-700 hover:text-gray-900">Register</Link>
             </div>
         </nav>
         </>
