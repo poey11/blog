@@ -7,7 +7,6 @@ function Navbar() {
     const { user, loading } = useAuth();
 
     const navigate = useNavigate();
-    console.log('User in Navbar:', user, 'Loading:', loading)
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -21,9 +20,9 @@ function Navbar() {
 
                 <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
                 <Link to="/about" className="text-gray-700 hover:text-gray-900">About</Link>
-                {loading ? (
+                {user ? (
                     <>
-                        <span className="text-gray-700">Welcome, {user?.user_metadata?.username }</span>
+                        <Link to ={`/profile/`+user.id} className="text-gray-700">Welcome, {user?.user_metadata?.username }</Link>
                         <Link to = "/create" className="text-gray-700 hover:text-gray-900" >Create Blog</Link>
                         <button onClick={handleLogout}  className="text-gray-700 hover:text-gray-900 cursor-pointer">Logout</button>
                     

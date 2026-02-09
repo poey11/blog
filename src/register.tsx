@@ -23,7 +23,7 @@ function Register() {
         e.preventDefault()
         console.log('User registered:', NewUser)
         setLoading(true);
-        const {error } = await supabase.auth.signUp({
+        const {data,error } = await supabase.auth.signUp({
             email: NewUser.email,
             password: NewUser.password,
          
@@ -39,8 +39,14 @@ function Register() {
             setError(error.message)
         } else {
             setError(null)
-            alert('Registration successful')
-            navigate('/login')
+
+            const {error} = await supabase.from('profiles').insert({
+                id: data?.user?.id,
+                username: NewUser.username,
+                email: NewUser.email,
+            })
+
+            navigate('/')
         }
         
     

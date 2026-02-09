@@ -21,19 +21,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const {data} = supabase.auth.onAuthStateChange((event, session) => {
-            if(event  === 'INITIAL_SESSION'){
+            
+            if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
                 setUser(session?.user || null);
-                setLoading(true);
-            }
-            else if(event === 'SIGNED_IN'){
-                setUser(session?.user || null);
-                setLoading(true);
             }
             else if(event === 'SIGNED_OUT'){
                 setUser(null);
-                setLoading(false);
             }
         })
+        setLoading(false);
         return () => {
             data.subscription.unsubscribe();
         }
