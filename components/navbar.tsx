@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext.tsx";
 
 function Navbar() {
-    const { user, loading } = useAuth();
+    const { user } = useAuth();
 
     const navigate = useNavigate();
 

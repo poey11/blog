@@ -40,7 +40,7 @@ function Register() {
         } else {
             setError(null)
 
-            const {error} = await supabase.from('profiles').insert({
+            const {} = await supabase.from('profiles').insert({
                 id: data?.user?.id,
                 username: NewUser.username,
                 email: NewUser.email,

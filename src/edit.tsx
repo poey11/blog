@@ -4,12 +4,6 @@ import {   useState,useEffect } from "react";
 import supabase from "../db/supabaseClient";
 import { useNavigate, useParams } from "react-router-dom";
 
-interface blogType{
-    title: string;
-    content: string;
-    image: string;
-}
-
 function Edit() {
     const { id } = useParams();
 
@@ -50,8 +44,8 @@ function Edit() {
 
     const removeOldImage = async () => {
         if(!blogData.image) return;
-        
-        const { data, error } = await supabase.storage.from('blog_image').remove([`public/${oldImage}`]);
+    
+        const {  error } = await supabase.storage.from('blog_image').remove([`public/${oldImage}`]);
         if (error) {
              console.error('Error deleting old image:', error);
              alert('Failed to delete old image');
@@ -92,7 +86,7 @@ function Edit() {
             return;
         }
         handleFileUpload();
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from('blog')
             .update({
                 title: blogData.title,
