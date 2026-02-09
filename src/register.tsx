@@ -1,23 +1,50 @@
 import Navbar from '../components/navbar.tsx'
-import { useState } from 'react'
+import supabase from '../db/supabaseClient.tsx'
+import { useNavigate } from 'react-router-dom'
+import { useState } from 'react' 
 
 function Register() {
-    const [user, setUser] = useState({
+    const [NewUser, setNewUser] = useState({
         username: '',
         email: '',
         password: '',
-        confirmPassword: ''
     })
 
+    const navigate = useNavigate();
+    const [error, setError] = useState<string | null>(null)
+
+    const [loading, setLoading] = useState(false)
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUser({...user, [e.target.name]: e.target.value})
-        
+        setNewUser({...NewUser, [e.target.name]: e.target.value})
     }
 
-    const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault()
-        // Here you would typically send the user data to your backend for registration
-        console.log('User registered:', user)
+        console.log('User registered:', NewUser)
+        setLoading(true);
+        const {error } = await supabase.auth.signUp({
+            email: NewUser.email,
+            password: NewUser.password,
+         
+            options:{
+                data:{
+                    username: NewUser.username
+                }
+            }
+        })
+
+        setLoading(false);
+        if (error) {
+            setError(error.message)
+        } else {
+            setError(null)
+            alert('Registration successful')
+            navigate('/login')
+        }
+        
+    
+
     }
 
     return(
@@ -27,15 +54,16 @@ function Register() {
                 <h1 className="text-4xl font-bold c">Register</h1>
 
                 <div className="flex flex-col space-y-4 mt-8 border border-gray-300 rounded-md p-8">
+                    {error && <div className="text-red-500">{error}</div>}
                     <input type="text" placeholder="Username" name="username"
                         onChange={handleChange}
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <input type="email" placeholder="Email" name="email" onChange={handleChange} className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <input type="password" placeholder="Password" name="password" onChange={handleChange} className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                    <input type="password" placeholder="Confirm Password" name="confirmPassword" onChange={handleChange} className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <button className="px-4 py-2 bg-blue-500 
                         text-white rounded-md hover:bg-blue-600"onClick={handleSubmit}>
-                    Register</button>
+                        {loading ? 'Registering...' : 'Register'}
+                    </button>
                 </div>
             </div>
             
