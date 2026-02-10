@@ -1,10 +1,15 @@
 import {Link } from "react-router-dom"
 import supabase from '../db/supabaseClient.tsx'
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/authContext.tsx";
-
+import { useSelector } from "react-redux";
+interface userType{
+    isUserSignedIn: boolean;
+    email: string | null;
+    username: string | null;
+    id: string | null;
+}
 function Navbar() {
-    const { user } = useAuth();
+    const user:userType = useSelector((state: any) => state.user);
 
     const navigate = useNavigate();
 
@@ -20,9 +25,9 @@ function Navbar() {
 
                 <Link to="/" className="text-gray-700 hover:text-gray-900">Home</Link>
                 <Link to="/about" className="text-gray-700 hover:text-gray-900">About</Link>
-                {user ? (
+                {user.isUserSignedIn ? (
                     <>
-                        <Link to ={`/profile/`+user.id} className="text-gray-700">Welcome, {user?.user_metadata?.username }</Link>
+                        <Link to ={`/profile/`+user.id} className="text-gray-700">Welcome, {user.username }</Link>
                         <Link to = "/create" className="text-gray-700 hover:text-gray-900" >Create Blog</Link>
                         <button onClick={handleLogout}  className="text-gray-700 hover:text-gray-900 cursor-pointer">Logout</button>
                     

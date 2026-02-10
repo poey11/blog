@@ -2,9 +2,17 @@ import Navbar from "../components/navbar"
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import supabase from "../db/supabaseClient"
-import { useAuth } from "../context/authContext.tsx";
 import { useNavigate } from "react-router-dom"
 import CommentCard from "../components/commentCard.tsx";
+import { useSelector, useDispatch } from "react-redux";
+
+
+interface userType{
+    id: string | null;
+    isUserSignedIn: boolean;
+    email: string | null;
+    username: string | null;
+}
 
 interface BlogType {
     id: string;
@@ -35,7 +43,7 @@ function View() {
         author_id: '',
         image: '',
     });
-    const { user } = useAuth();
+    const user : userType = useSelector((state: any) => state.user);
 
     const navigate = useNavigate();
 
@@ -97,10 +105,15 @@ function View() {
 
     },[blog.author_id]);
 
+    const deleteBlog = () =>{
+        dispatch({ type: 'blog/removeBlog', payload: id });
+    }
+
     const handleDelete = async () => {
         if (!id) return;
        
         handleDeleteImage();
+        deleteBlog();
         const { error } = await supabase
             .from('blog')
             .delete()
@@ -127,10 +140,10 @@ function View() {
     const handleEdit = () => {
         navigate(`/edit/${id}`);
     }
-
+    
     const [comment, setComment] = useState<commentType>({
         id: '',
-        cAuthor_id: user?.id,
+        cAuthor_id: user.id || '',
         created_at: '',
         comment: '',
         image: '',
@@ -163,6 +176,10 @@ function View() {
     
     }
 
+    const addComment = (newComment: commentType) => {
+        dispatch({ type: 'comment/addComments', payload: newComment });
+    }
+
     const handleCommentSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if(!comment.comment){
@@ -173,7 +190,7 @@ function View() {
         const { error } = await supabase
             .from('comments')
             .insert([{
-                cAuthor_id: user?.id || '',
+                cAuthor_id: user.id || '',
                 comment: comment.comment,
                 image: comment.image,
                 created_at: new Date(),
@@ -185,13 +202,25 @@ function View() {
         }
         else{
             alert('Comment submitted successfully');
+            addComment(comment);
             navigate(0);
         }
     }
 
-    const [comments, setComments] = useState<commentType[]>([]);
+    
+    const comments : commentType[] = useSelector((state: any) => state.comments);
+    const setComments = (commentsData: commentType[]) => {
+        dispatch({ type: 'comment/setComments', payload: commentsData });
+    }
+
+    const loading = useSelector((state: any) => state.loading);
+    const dispatch = useDispatch();
+    const setLoading = (isLoading: boolean) => {
+        dispatch({ type: 'load/setLoading', payload: isLoading });
+    }
     useEffect(() => {
         const fetchComments = async () => {
+            setLoading(true);
             if (!id) return;
             const { data, error } = await supabase
                 .from('comments')
@@ -204,6 +233,8 @@ function View() {
                 setComments(data);
                 
             }
+            setLoading(true);
+
         }
         fetchComments();
     }, [id]);
@@ -216,7 +247,7 @@ function View() {
             <Navbar />
             <div className="container mx-auto p-4 bg-white rounded-lg shadow-md mt-6">
                 <h1 className="text-3xl font-bold mb-2">{blog.title}</h1>
-                {blog.author_id === user?.id && (
+                {blog.author_id === user.id && (
                     <>
                         <button className="bg-blue-500 text-white px-4 py-2 rounded mb-4 cursor-pointer" onClick={handleEdit}>Edit</button>
                         <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded mb-4 ml-2 cursor-pointer">Delete</button>
@@ -227,19 +258,28 @@ function View() {
                 {imageSrc && <img src={imageSrc} alt="Blog Image" />}
                 <p className="text-lg l text-justify">{blog.content}</p>
             </div>
-            <div className="container mx-auto p-4 bg-white rounded-lg shadow-md mt-6">
-                <h2 className="text-2xl font-bold mb-2">Comments</h2>
-                {comments.length === 0 ? (
-                    <p>No comments yet. Be the first to comment!</p>
-                ) : (   
-                    comments.map((comment,index) => (
-                        <CommentCard key={index} cAuthor_id={comment.cAuthor_id} 
-                        comment={comment.comment} created_at={comment.created_at} image={comment.image}
-                        />
-                    ))
-                )}
-            </div>
-            {user && (
+            {loading ? (
+                <div className="p-4">
+                    <p className="text-center text-gray-500 mt-8">Loading comments...</p>
+                </div>
+            ) : (
+                <>
+                    <div className="container mx-auto p-4 bg-white rounded-lg shadow-md mt-6">
+                        <h2 className="text-2xl font-bold mb-2">Comments</h2>
+                        {comments.length === 0 ? (
+                            <p>No comments yet. Be the first to comment!</p>
+                        ) : (   
+                            comments.map((comment,index) => (
+                                <CommentCard key={index} cAuthor_id={comment.cAuthor_id} 
+                                comment={comment.comment} created_at={comment.created_at} image={comment.image}
+                                />
+                            ))
+                        )}
+                    </div>
+                </>
+            )}
+            
+            {user.isUserSignedIn&& (
                 <>
                     <form onSubmit={handleCommentSubmit} className="container mx-auto p-4 bg-white rounded-lg shadow-md mt-6">
                         <h3 className="text-1xl font-bold mb-2">Write a Comment....</h3>

@@ -11,6 +11,8 @@ import Create from './create.tsx'
 import View from './view.tsx'
 import Edit from './edit.tsx'
 import Profile from './profile.tsx'
+import { Provider } from 'react-redux'
+import load from '../redux/load.tsx'
 
 // Router setup
 const router = createBrowserRouter([
@@ -27,8 +29,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <Provider store={load}>
+      <AuthProvider>
+        
+        <RouterProvider router={router} />
+      
+      </AuthProvider>
+   </Provider>
   </StrictMode>,
 )

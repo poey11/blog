@@ -3,6 +3,8 @@ import Navbar from "../components/navbar";
 import {   useState,useEffect } from "react";
 import supabase from "../db/supabaseClient";
 import { useNavigate, useParams } from "react-router-dom";
+import {  useDispatch } from "react-redux";
+
 
 function Edit() {
     const { id } = useParams();
@@ -16,6 +18,11 @@ function Edit() {
     });
 
     const [oldImage, setOldImage] = useState<string>('');
+    const dispatch = useDispatch();
+    
+    const updateBlogInStore = (updatedBlog: any) => {
+        dispatch({ type: 'blog/updateBlog', payload: updatedBlog });
+    }
 
     useEffect(() => {
         const fetchBlog = async () => {
@@ -29,6 +36,8 @@ function Edit() {
                 console.error('Error fetching blog for edit:', error);
             }
             else {
+                
+
                 setBlogData({
                     title: data.title,
                     content: data.content,
@@ -99,6 +108,7 @@ function Edit() {
             alert('Failed to update blog post');
         }
         else{
+            updateBlogInStore({ id, ...blogData });
             alert('Blog post updated successfully');
             navigate(`/view/${id}`);
         }

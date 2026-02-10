@@ -16,6 +16,8 @@ function BlogCard({ title, imageUrl ,created_at, author_id,id }: BlogCardProps) 
 
    const [author, setAuthor] = useState<string>('');
 
+   
+
   useEffect(() => {
     const fetchAuthor = async () => {
       if (!author_id) return;

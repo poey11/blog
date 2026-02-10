@@ -1,3 +1,4 @@
+import { useDispatch, useSelector } from 'react-redux'
 import Navbar from '../components/navbar.tsx'
 import supabase from '../db/supabaseClient.tsx'
 import { useState } from 'react' 
@@ -13,7 +14,12 @@ function Login() {
 
     const [error, setError] = useState<string | null>(null)
 
-    const [loading, setLoading] = useState(false)
+    const loading = useSelector((state: any) => state.load.loading);
+    const dispatch = useDispatch();
+
+    const setLoading = (isLoading: boolean) => {
+        dispatch({ type: 'load/setLoading', payload: isLoading });
+    };
     
     const navigate = useNavigate();
 

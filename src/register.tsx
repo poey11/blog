@@ -2,6 +2,7 @@ import Navbar from '../components/navbar.tsx'
 import supabase from '../db/supabaseClient.tsx'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react' 
+import { useDispatch, useSelector } from 'react-redux'
 
 function Register() {
     const [NewUser, setNewUser] = useState({
@@ -13,7 +14,12 @@ function Register() {
     const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null)
 
-    const [loading, setLoading] = useState(false)
+    const loading = useSelector((state: any) => state.load.loading);
+    const dispatch = useDispatch();
+
+    const setLoading = (isLoading: boolean) => {
+        dispatch({ type: 'load/setLoading', payload: isLoading });
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewUser({...NewUser, [e.target.name]: e.target.value})

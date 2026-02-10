@@ -1,8 +1,8 @@
 import Navbar from "../components/navbar";
-import { useAuth } from "../context/authContext";
 import {   useState } from "react";
 import supabase from "../db/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 
 interface blogType{
@@ -14,14 +14,14 @@ interface blogType{
 }
 
 function Create(){
-    const { user } = useAuth();
+    const user = useSelector((state: any) => state.user);
     const navigate = useNavigate();
 
     const [blogData, setBlogData] = useState<blogType>({
         title: '',
         content: '',
         image: '',
-        author_id: user?.id,
+        author_id: user.id,
         created_at: new Date(),
     });
 
@@ -78,7 +78,7 @@ function Create(){
                 title: '',
                 content: '',
                 image: '',
-                author_id: user?.id,
+                author_id: user.id,
                 created_at: new Date(),
             });
             navigate('/');
